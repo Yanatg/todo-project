@@ -1,0 +1,12 @@
+{% extends 'base.html' %}
+
+{% block title %}Home - Todo App{% endblock %}
+
+{% block content %}
+    <h2>Welcome to the Todo App!</h2>
+    {% if user.is_authenticated %}
+        <p>You are logged in. Go manage your todos!</p>
+        {% else %}
+        <p>Please <a href="{% url 'login' %}">login</a> or <a href="{% url 'signup' %}">sign up</a> to continue.</p>
+    {% endif %}
+{% endblock %}
