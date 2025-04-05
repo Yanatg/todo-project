@@ -1,12 +1,78 @@
-{% extends 'base.html' %}
+{# templates/registration/signup.html #}
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Sign Up - Todo App</title>
+    {# Link to your plain CSS file for authentication pages #}
+    <link rel="stylesheet" href="{% static 'css/auth_style.css' %}">
+</head>
+{# Add the 'signup-page' class here to enable specific CSS rules #}
+<body class="signup-page">
+    {# Main container styled by .auth-container in auth_style.css #}
+    {# Specific styles like border-top will apply due to .signup-page body class #}
+    <div class="auth-container">
 
-{% block title %}Sign Up{% endblock %}
+        {# Heading styled by h2 rules, overridden by .signup-page h2 if defined #}
+        <h2>Create your account</h2>
 
-{% block content %}
-  <h2>Sign Up</h2>
-  <form method="post">
-    {% csrf_token %}
-    {{ form.as_p }} {# Renders the signup form fields as paragraphs #}
-    <button type="submit">Sign Up</button>
-  </form>
-{% endblock %}
+        {# Form styled by .auth-form rules #}
+        <form class="auth-form" method="post" action="{% url 'signup' %}">
+            {% csrf_token %}
+
+            {# Display Non-field errors (if any) #}
+            {% if form.non_field_errors %}
+                <div class="non-field-errors">
+                    {% for error in form.non_field_errors %}
+                        <p>{{ error }}</p>
+                    {% endfor %}
+                </div>
+            {% endif %}
+
+            {# --- Manual Field Rendering (Replaces {{ form.as_p }}) --- #}
+            {# This loop allows applying styles to inputs and displaying errors/help text correctly #}
+            {% for field in form %}
+                <div>
+                    {# Label is visually hidden by default in auth_style.css, relies on placeholder #}
+                    <label for="{{ field.id_for_label }}">{{ field.label }}</label>
+
+                    {# Input field - styled by input[type=...] rules in auth_style.css #}
+                    <input id="{{ field.id_for_label }}"
+                           name="{{ field.name }}"
+                           type="{{ field.field.widget.input_type }}"
+                           placeholder="{{ field.label }}"
+                           {% if field.field.required %}required{% endif %}
+                           aria-describedby="{% if field.errors %}{{ field.id_for_label }}_error{% endif %} {% if field.help_text %}{{ field.id_for_label }}_helptext{% endif %}"
+                           >
+
+                    {# Display Field-specific errors - styled by .error-message #}
+                    {% if field.errors %}
+                        <p class="error-message" id="{{ field.id_for_label }}_error">
+                            {% for error in field.errors %}
+                              {{ error }}
+                            {% endfor %}
+                        </p>
+                    {% endif %}
+
+                    {# Display Help text - styled by .help-text if you add rules for it #}
+                    {% if field.help_text %}
+                        <p class="help-text" id="{{ field.id_for_label }}_helptext">{{ field.help_text|safe }}</p>
+                    {% endif %}
+                </div>
+            {% endfor %}
+            {# --- End of Manual Field Rendering --- #}
+
+            {# Submit button styled by button[type=submit] rules, overridden by .signup-page button if defined #}
+            <button type="submit">Sign Up</button>
+        </form>
+
+        {# Links styled by .auth-links rules, overridden by .signup-page .auth-links if defined #}
+        <div class="auth-links">
+            <p>Already have an account? <a href="{% url 'login' %}">Log In</a></p>
+            <p><a href="{% url 'home' %}">&larr; Back to Home</a></p>
+        </div>
+    </div>
+</body>
+</html>

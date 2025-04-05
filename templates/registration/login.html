@@ -1,12 +1,72 @@
-{% extends 'base.html' %}
+{# templates/registration/login.html #}
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Login - Todo App</title>
+    {# Link to your plain CSS file for authentication pages #}
+    <link rel="stylesheet" href="{% static 'css/auth_style.css' %}">
+</head>
+<body>
+    {# Main container styled by auth_style.css #}
+    <div class="auth-container">
+        <h2>Log in to your account</h2>
 
-{% block title %}Login{% endblock %}
+        {# Form styled by auth_style.css #}
+        <form class="auth-form" method="post" action="{% url 'login' %}"> {# Action points to Django's login view URL #}
+            {% csrf_token %}
 
-{% block content %}
-  <h2>Log In</h2>
-  <form method="post">
-    {% csrf_token %}
-    {{ form.as_p }} {# Renders the login form fields as paragraphs #}
-    <button type="submit">Log In</button>
-  </form>
-{% endblock %}
+            {# Display Non-field errors (e.g., invalid login credentials) first #}
+            {% if form.non_field_errors %}
+                <div class="non-field-errors">
+                    {% for error in form.non_field_errors %}
+                        <p>{{ error }}</p>
+                    {% endfor %}
+                </div>
+            {% endif %}
+
+            {# Render form fields manually #}
+            {% for field in form %}
+                <div>
+                    {# Label is visually hidden by default in auth_style.css, relies on placeholder #}
+                    <label for="{{ field.id_for_label }}">{{ field.label }}</label>
+
+                    {# Input field #}
+                    <input id="{{ field.id_for_label }}"
+                           name="{{ field.name }}"
+                           type="{{ field.field.widget.input_type }}"
+                           placeholder="{{ field.label }}"
+                           {% if field.field.required %}required{% endif %}
+                           {# Add aria-describedby for accessibility if there are errors/help text #}
+                           aria-describedby="{% if field.errors %}{{ field.id_for_label }}_error{% endif %} {% if field.help_text %}{{ field.id_for_label }}_helptext{% endif %}"
+                           >
+
+                    {# Display Field-specific errors #}
+                    {% if field.errors %}
+                        <p class="error-message" id="{{ field.id_for_label }}_error">
+                            {% for error in field.errors %}
+                              {{ error }}
+                            {% endfor %}
+                        </p>
+                    {% endif %}
+
+                    {# Display Help text #}
+                    {% if field.help_text %}
+                        <p class="help-text" id="{{ field.id_for_label }}_helptext">{{ field.help_text|safe }}</p> {# Style .help-text in CSS if needed #}
+                    {% endif %}
+                </div>
+            {% endfor %}
+
+            <button type="submit">Log in</button>
+        </form>
+
+        {# Links below the form #}
+        <div class="auth-links">
+            <p>Don't have an account? <a href="{% url 'signup' %}">Sign Up</a></p>
+            <p><a href="{% url 'home' %}">&larr; Back to Home</a></p>
+        </div>
+    </div>
+</body>
+</html>

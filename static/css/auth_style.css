@@ -1,0 +1,163 @@
+/* static/css/auth_style.css */
+
+html, body {
+    height: 100%; /* Allow body to fill viewport height */
+    margin: 0;
+    padding: 0;
+    font-family: sans-serif; /* Basic font */
+    background-color: #f7fafc; /* Light gray background (like gray-50) */
+}
+
+body {
+    display: flex;
+    align-items: center; /* Vertical center */
+    justify-content: center; /* Horizontal center */
+    padding: 2rem; /* Add some padding */
+}
+
+.auth-container {
+    background-color: #ffffff; /* White background for the form box */
+    padding: 2.5rem; /* Padding inside the box (like p-10) */
+    border-radius: 0.75rem; /* Rounded corners (like rounded-xl) */
+    box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05); /* Shadow (like shadow-lg) */
+    max-width: 28rem; /* Limit width (like max-w-md) */
+    width: 100%; /* Full width up to max-width */
+}
+
+.auth-container h2 {
+    margin-top: 0; /* Remove default margin if needed */
+    margin-bottom: 2rem; /* Space below heading (like space-y-8 overall) */
+    text-align: center;
+    font-size: 1.875rem; /* Like text-3xl */
+    font-weight: 800; /* Like font-extrabold */
+    color: #111827; /* Like text-gray-900 */
+}
+
+.auth-form label {
+    /* Using placeholders, so labels might be visually hidden, but style if shown */
+    /* display: block; */
+    /* margin-bottom: 0.5rem; */
+    /* font-weight: 500; */
+    /* color: #374151; */ /* Like text-gray-700 */
+    /* For sr-only type approach: */
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    padding: 0;
+    margin: -1px;
+    overflow: hidden;
+    clip: rect(0, 0, 0, 0);
+    white-space: nowrap;
+    border-width: 0;
+}
+
+.auth-form input[type="text"],
+.auth-form input[type="email"],
+.auth-form input[type="password"] {
+    display: block;
+    width: 100%; /* Take full width */
+    padding: 0.75rem 1rem; /* Padding inside input */
+    border: 1px solid #d1d5db; /* Border (like border-gray-300) */
+    border-radius: 0.375rem; /* Rounded corners (like rounded-md) */
+    box-sizing: border-box; /* Include padding and border in element's total width/height */
+    margin-bottom: 1rem; /* Space below each input */
+    font-size: 0.875rem; /* Like sm:text-sm */
+    box-shadow: inset 0 1px 2px 0 rgba(0,0,0,0.05); /* Like shadow-sm */
+}
+
+.auth-form input:focus {
+    outline: none;
+    border-color: #4f46e5; /* Like focus:border-indigo-500 */
+    box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.2); /* Optional focus ring */
+}
+
+.auth-form .error-message { /* Style for field errors */
+     color: #ef4444; /* Like text-red-500 */
+     font-size: 0.75rem; /* Like text-xs */
+     margin-top: -0.75rem; /* Pull up slightly */
+     margin-bottom: 1rem;
+}
+.auth-form .non-field-errors { /* Style for general form errors */
+    color: #ef4444;
+    font-size: 0.875rem;
+    margin-bottom: 1rem;
+    padding: 0.5rem;
+    background-color: #fee2e2; /* Light red background */
+    border: 1px solid #f87171;
+    border-radius: 0.375rem;
+}
+
+
+.auth-form button[type="submit"] {
+    display: flex;
+    justify-content: center;
+    width: 100%;
+    padding: 0.75rem 1rem;
+    border: 1px solid transparent;
+    border-radius: 0.375rem;
+    background-color: #4f46e5; /* Like bg-indigo-600 */
+    color: white;
+    font-size: 0.875rem;
+    font-weight: 500; /* Like font-medium */
+    cursor: pointer;
+    transition: background-color 0.15s ease-in-out;
+    margin-top: 1rem; /* Space above button */
+}
+
+.auth-form button[type="submit"]:hover {
+    background-color: #4338ca; /* Like hover:bg-indigo-700 */
+}
+
+.auth-links {
+    margin-top: 2rem; /* Space above links */
+    text-align: center;
+    font-size: 0.875rem; /* Like text-sm */
+    color: #4b5563; /* Like text-gray-600 */
+}
+
+.auth-links a {
+    color: #4f46e5; /* Like text-indigo-600 */
+    font-weight: 500; /* Like font-medium */
+    text-decoration: none;
+}
+
+.auth-links a:hover {
+    color: #4338ca; /* Like hover:text-indigo-500 */
+    text-decoration: underline;
+}
+
+.auth-links p {
+    margin: 0.5rem 0 0 0; /* Spacing between link paragraphs */
+}
+
+/* --- Sign Up Page Specific Styles --- */
+/* Add these new rules at the end */
+
+/* Example: Change the background color of the signup button */
+.signup-page .auth-form button[type="submit"] {
+    background-color: #059669; /* Green color (e.g., like Emerald 600) */
+    border-color: #047857;
+}
+
+.signup-page .auth-form button[type="submit"]:hover {
+    background-color: #047857; /* Darker green on hover */
+}
+
+/* Example: Change the heading color */
+.signup-page .auth-container h2 {
+    color: #059669; /* Match the button green */
+}
+
+/* Example: Add a top border to the container */
+.signup-page .auth-container {
+    border-top: 5px solid #059669;
+}
+
+/* Example: Change the link color */
+.signup-page .auth-links a {
+    color: #065f46; /* Darker Green */
+}
+
+.signup-page .auth-links a:hover {
+    color: #047857;
+}
