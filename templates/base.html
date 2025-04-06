@@ -1,131 +1,378 @@
-{# templates/base.html #}
-{% load static %} {# Ensure static is loaded if you link external CSS/JS later #}
+{# templates/base.html #} {% load static %}
 <!DOCTYPE html>
 <html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>{% block title %}Todo App{% endblock %}</title>
     <style>
-        /* Basic body reset and font */
-        body {
-            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
-            margin: 0; /* Remove default body margin */
-            padding: 0;
-            background-color: #f8f9fa; /* Light background for the page */
-            color: #212529;
-        }
+      /* Basic body reset and font */
+      body {
+        font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+        margin: 0;
+        padding: 0;
+        color: #212529;
+        
+        background-image: url("{% static 'images/bg.png' %}"); /* USE YOUR IMAGE FILENAME */
+        background-size: cover; /* Cover the entire viewport */
+        background-position: center center; /* Center the image */
+        background-repeat: no-repeat; /* Do not repeat the image */
+        background-attachment: fixed; /* Keep background fixed during scroll */
+        /* Add a fallback background color in case the image fails to load */
+        background-color: #f8f9fa;
+        /* Ensure minimum height for viewport coverage even with little content */
+        min-height: 100vh;
+    }
 
-        /* Navigation Bar Styling */
-        nav {
-            background-color: #ffffff; /* White background for nav */
-            padding: 0.75rem 1.5rem;  /* Vertical and horizontal padding */
-            margin-bottom: 0; /* Remove default margin if any */
-            box-shadow: 0 2px 4px rgba(0,0,0,0.1); /* Add subtle shadow */
 
-            /* Flexbox for alignment */
-            display: flex;
-            justify-content: space-between; /* Space out logo/links and auth section */
-            align-items: center; /* Vertically center items */
-            border-bottom: none; /* Remove the old border */
-        }
+      /* Navigation Bar Styling */
+      nav {
+        background-color:rgb(255, 213, 74); /* White background for nav */
+        padding: 0.75rem 1.5rem; /* Vertical and horizontal padding */
+        margin-bottom: 0; /* Remove default margin if any */
+        box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1); /* Add subtle shadow */
 
-        /* Styling for nav links */
-        nav a {
-            color: #007bff; /* Blue link color */
-            text-decoration: none; /* Remove underline */
-            padding: 0.5rem 0.75rem; /* Add padding for easier clicking */
-            border-radius: 0.25rem; /* Slightly round corners for hover effect */
-            transition: background-color 0.2s ease-in-out, color 0.2s ease-in-out;
-            margin-right: 0.5rem; /* Reduced margin slightly */
-        }
+        /* Flexbox for alignment */
+        display: flex;
+        justify-content: space-between; /* Space out logo/links and auth section */
+        align-items: center; /* Vertically center items */
+        border-bottom: none; /* Remove the old border */
+      }
 
-        nav a:hover, nav a:focus {
-            background-color: #e9ecef; /* Light background on hover */
-            color: #0056b3; /* Darker blue on hover */
-        }
+      /* Styling for nav links */
+      nav a {
+        color:rgb(0, 0, 0); /* Blue link color */
+        text-decoration: none; /* Remove underline */
+        padding: 0.5rem 0.75rem; /* Add padding for easier clicking */
+        border-radius: 0.25rem; /* Slightly round corners for hover effect */
+        transition: background-color 0.2s ease-in-out, color 0.2s ease-in-out;
+        margin-right: 0.5rem; /* Reduced margin slightly */
+      }
 
-        /* Styling for the "Hi User!" text and logout form/button */
-        nav .auth-section {
-            display: flex; /* Use flexbox to align items horizontally */
-            align-items: center; /* Vertically align items */
-        }
+      nav a:hover,
+      nav a:focus {
+        background-color: #e9ecef; /* Light background on hover */
+        color: #0056b3; /* Darker blue on hover */
+      }
 
-        nav .auth-section span {
-            margin-right: 1rem; /* Space between username and logout */
-            color: #6c757d; /* Gray color for the greeting */
-        }
+      /* Styling for the "Hi User!" text and logout form/button */
+      nav .auth-section {
+        display: flex; /* Use flexbox to align items horizontally */
+        align-items: center; /* Vertically align items */
+      }
 
-        /* Ensure the logout form and button integrate well */
-        nav .auth-section form {
-            display: inline; /* Keep form inline */
-            margin: 0;
-            padding: 0;
-        }
+      nav .auth-section span {
+        margin-right: 1rem; /* Space between username and logout */
+        color: #6c757d; /* Gray color for the greeting */
+      }
 
-        nav .auth-section button {
-            background: none;
-            border: none;
-            padding: 0.5rem 0.75rem; /* Match link padding */
-            margin: 0;
-            color: #dc3545; /* Red color for logout */
-            text-decoration: none; /* Look like other links */
-            cursor: pointer;
-            font-size: inherit;
-            font-family: inherit;
-            vertical-align: baseline; /* Align with text */
-            border-radius: 0.25rem;
-            transition: background-color 0.2s ease-in-out, color 0.2s ease-in-out;
-        }
+      /* Ensure the logout form and button integrate well */
+      nav .auth-section form {
+        display: inline; /* Keep form inline */
+        margin: 0;
+        padding: 0;
+      }
 
-        nav .auth-section button:hover,
-        nav .auth-section button:focus {
-            background-color: #f8d7da; /* Light red background on hover */
-            color: #721c24; /* Darker red on hover */
-            text-decoration: none; /* Keep no underline on hover */
-        }
+      nav .auth-section button {
+        background: none;
+        border: none;
+        padding: 0.5rem 0.75rem; /* Match link padding */
+        margin: 0;
+        color: #dc3545; /* Red color for logout */
+        text-decoration: none; /* Look like other links */
+        cursor: pointer;
+        font-size: inherit;
+        font-family: inherit;
+        vertical-align: baseline; /* Align with text */
+        border-radius: 0.25rem;
+        transition: background-color 0.2s ease-in-out, color 0.2s ease-in-out;
+      }
 
-        /* General content area padding */
-        .content {
-            margin-top: 0; /* Remove margin now nav has shadow */
-            padding: 2rem; /* Add padding around main content */
-        }
+      nav .auth-section button:hover,
+      nav .auth-section button:focus {
+        background-color: #f8d7da; /* Light red background on hover */
+        color: #721c24; /* Darker red on hover */
+        text-decoration: none; /* Keep no underline on hover */
+      }
 
-        /* Keep minimal form styles if needed elsewhere, but avoid conflicts */
-        /* Consider moving form styling to specific templates or a separate CSS file */
-        /* form p { margin-bottom: 10px; } */
-        /* form label { display: block; margin-bottom: 5px; } */
+      /* General content area padding */
+      .content {
+        margin-top: 0; /* Remove margin now nav has shadow */
+        padding: 2rem; /* Add padding around main content */
+      }
 
+      /* Keep minimal form styles if needed elsewhere, but avoid conflicts */
+      /* Consider moving form styling to specific templates or a separate CSS file */
+      /* form p { margin-bottom: 10px; } */
+      /* form label { display: block; margin-bottom: 5px; } */
+
+      /* === Card Style === */
+      .card {
+        background-color: #ffffff;
+        padding: 1.5rem;
+        border-radius: 0.5rem;
+        box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+        margin-bottom: 1.5rem;
+      }
+
+      /* === General Content Styling === */
+      .content h2 {
+        color: #343a40;
+        margin-top: 0;
+        margin-bottom: 1rem;
+        border-bottom: 1px solid #dee2e6;
+        padding-bottom: 0.5rem;
+      }
+
+      .section-divider {
+        border: none;
+        border-top: 1px solid #e0e0e0;
+        margin: 2rem 0;
+      }
+
+      /* === Add Todo Form Styling === */
+      .add-todo-form .form-field {
+        margin-bottom: 1rem;
+      }
+      .add-todo-form label {
+        display: block;
+        margin-bottom: 0.3rem;
+        font-weight: 500;
+        color: #495057;
+      }
+      .form-input {
+        /* Base style for input and textarea */
+        display: block;
+        width: 100%;
+        padding: 0.6rem 0.75rem;
+        font-size: 1rem;
+        line-height: 1.5;
+        color: #495057;
+        background-color: #fff;
+        background-clip: padding-box;
+        border: 1px solid #ced4da;
+        border-radius: 0.25rem;
+        box-sizing: border-box;
+        transition: border-color 0.15s ease-in-out, box-shadow 0.15s ease-in-out;
+      }
+      .form-input:focus {
+        color: #495057;
+        background-color: #fff;
+        border-color: #80bdff;
+        outline: 0;
+        box-shadow: 0 0 0 0.2rem rgba(0, 123, 255, 0.25);
+      }
+      .form-textarea {
+        min-height: calc(
+          1.5em + (0.75rem * 2) + 2px
+        ); /* Match input height initially */
+        resize: vertical; /* Allow vertical resize */
+      }
+      .form-errors {
+        color: #dc3545;
+        font-size: 0.875em;
+        margin-top: 0.25rem;
+      }
+      .help-text {
+        color: #6c757d;
+        font-size: 0.875em;
+        margin-top: 0.25rem;
+      }
+
+      /* === Button Styling === */
+      .button {
+        display: inline-block;
+        font-weight: 400;
+        color: #212529;
+        text-align: center;
+        vertical-align: middle;
+        cursor: pointer;
+        user-select: none;
+        background-color: transparent;
+        border: 1px solid transparent;
+        padding: 0.5rem 0.8rem;
+        font-size: 0.9rem;
+        line-height: 1.5;
+        border-radius: 0.25rem;
+        transition: color 0.15s ease-in-out, background-color 0.15s ease-in-out,
+          border-color 0.15s ease-in-out, box-shadow 0.15s ease-in-out;
+        text-decoration: none; /* For button links if used */
+      }
+      .button-primary {
+        color: rgb(0, 0, 0);
+        background-color:rgb(255, 213, 74);
+        border-color: rgb(255, 213, 74);
+      }
+      .button-primary:hover {
+        background-color:rgb(255, 213, 74);
+        border-color: #0056b3;
+      }
+      .button-update {
+        color: #17a2b8;
+        border: 1px solid #17a2b8;
+        background-color: white;
+      }
+      .button-update:hover {
+        color: #fff;
+        background-color: #17a2b8;
+      }
+      .button-delete {
+        color: #dc3545;
+        border: 1px solid #dc3545;
+        background-color: white;
+      }
+      .button-delete:hover {
+        color: #fff;
+        background-color: #dc3545;
+      }
+      .inline-form {
+        /* Make forms wrapping buttons display inline */
+        display: inline-block;
+        margin-right: 0.5rem; /* Add space between buttons */
+      }
+      .inline-form button {
+        margin: 0; /* Reset default button margins if any */
+      }
+
+      /* === Todo List Styling === */
+      .todo-list {
+        list-style: none;
+        padding: 0;
+        margin: 0; /* Remove default ul margin */
+        max-height: 600px; /* Limit height for scrolling */
+        overflow-y: auto; /* Enable vertical scrolling */
+      }
+      .todo-item {
+        /* Using .card style defined above */
+        display: flex; /* Align content and actions */
+        justify-content: space-between;
+        align-items: flex-start; /* Align items to the top */
+        gap: 1rem; /* Space between content and actions */
+      }
+      .todo-item-done {
+        background-color: #e8f5e9 !important; /* Light green background */
+        opacity: 0.75;
+      }
+      .todo-item-done .todo-title {
+        text-decoration: line-through;
+        color: #555;
+      }
+      .todo-content {
+        flex-grow: 1; /* Allow content to take available space */
+      }
+      .todo-title {
+        font-weight: 600;
+        color: #333;
+        margin-right: 0.5rem; /* Space between title and status */
+      }
+      .todo-status {
+        font-size: 0.85em;
+        color: #6c757d;
+        font-style: italic;
+      }
+      .todo-description {
+        font-size: 0.9em;
+        color: #555;
+        margin-top: 0.3rem;
+        margin-bottom: 0.5rem;
+      }
+      .todo-timestamp {
+        font-size: 0.8em;
+        color: #888;
+      }
+      .todo-actions {
+        /* Flex properties for buttons if needed, but inline-form handles basic layout */
+        white-space: nowrap; /* Prevent buttons from wrapping */
+        margin-top: 0.25rem; /* Align slightly better */
+      }
+
+      /* === Logged Out Message Styling === */
+      .welcome-message {
+        text-align: center;
+      }
+      .no-todos-message {
+        color: #6c757d;
+        font-style: italic;
+        margin-top: 1rem;
+      }
+      /* === Home Page Layout === */
+      .home-layout {
+        display: flex; /* Enable Flexbox */
+        flex-wrap: wrap; /* Allow wrapping on smaller screens if needed */
+        gap: 1.5rem; /* Space between the two columns */
+      }
+
+      /* Optional: Adjustments for elements within columns */
+      .add-todo-column .card {
+        margin-bottom: 0; /* Remove bottom margin if card is the only item */
+      }
+
+      .todo-list-section h2 {
+        /* Keep heading styles consistent if needed */
+      }
+      /* If the no-todos message looks odd, adjust its styling */
+      .no-todos-message {
+        text-align: center;
+        padding: 2rem 1.5rem; /* Add padding since it's now a card */
+      }
+
+      /* === Home Page Layout === */
+      .home-layout {
+        display: flex; /* Enable Flexbox */
+        flex-wrap: wrap; /* Allow wrapping on smaller screens if needed */
+        gap: 1.5rem; /* Space between the two columns */
+      }
+
+      .home-column {
+        flex: 1; /* Allow columns to grow equally */
+        min-width: 300px; /* Minimum width before wrapping (adjust as needed) */
+        /* Alternative: Equal width columns */
+        /* flex-basis: calc(50% - 0.75rem); /* 50% minus half the gap */
+        /* flex-grow: 0; */
+        /* flex-shrink: 0; */
+      }
+
+      /* Optional: Adjustments for elements within columns */
+      .add-todo-column .card {
+        margin-bottom: 0; /* Remove bottom margin if card is the only item */
+      }
+
+      .todo-list-section h2 {
+        /* Keep heading styles consistent if needed */
+      }
+      /* If the no-todos message looks odd, adjust its styling */
+      .no-todos-message {
+        text-align: center;
+        padding: 2rem 1.5rem; /* Add padding since it's now a card */
+      }
     </style>
-</head>
-<body>
+  </head>
+  <body>
     <nav>
-        {# Left side of Navbar #}
-        <div>
-            <a href="{% url 'home' %}">Home</a>
-            {# Add other main navigation links here if needed #}
-            {# Example: <a href="{% url 'about' %}">About</a> #}
-        </div>
+      {# Left side of Navbar #}
+      <div>
+        <a href="{% url 'home' %}">Home</a>
+      </div>
 
-        {# Right side of Navbar (Authentication related) #}
-        <div class="auth-section">
-            {% if user.is_authenticated %}
-                <span>Hi, {{ user.username }}!</span>
-                <form method="post" action="{% url 'logout' %}" style="display: inline; margin: 0; padding: 0;">
-                    {% csrf_token %}
-                    <button type="submit">Logout</button> {# Removed inline style, now handled by CSS block #}
-                </form>
-            {% else %}
-                <a href="{% url 'login' %}">Login</a>
-                <a href="{% url 'signup' %}">Sign Up</a>
-            {% endif %}
-        </div>
+      {# Right side of Navbar (Authentication related) #}
+      <div class="auth-section">
+        {% if user.is_authenticated %}
+        <span>Hi, {{ user.username }}!</span>
+        <form
+          method="post"
+          action="{% url 'logout' %}"
+          style="display: inline; margin: 0; padding: 0"
+        >
+          {% csrf_token %}
+          <button type="submit">Logout</button>
+        </form>
+        {% else %}
+        <a href="{% url 'login' %}">Login</a>
+        <a href="{% url 'signup' %}">Sign Up</a>
+        {% endif %}
+      </div>
     </nav>
 
-    <div class="content">
-        {% block content %}
-        {% endblock %}
-    </div>
-
-</body>
+    <div class="content">{% block content %} {% endblock %}</div>
+  </body>
 </html>

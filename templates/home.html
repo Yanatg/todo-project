@@ -1,4 +1,6 @@
+{# templates/home.html #}
 {% extends 'base.html' %}
+{% load static %}
 
 {% block title %}
     {% if user.is_authenticated %}My Todos{% else %}Home{% endif %} - Todo App
@@ -6,58 +8,96 @@
 
 {% block content %}
     {% if user.is_authenticated %}
-        {# --- Add Todo Form --- #}
-        <h2>Add a New Todo</h2>
-        <form method="post" action="{% url 'home' %}">
-             {% csrf_token %}
-             {{ add_todo_form.as_p }}
-             <button type="submit">Add Todo</button>
-        </form>
+        {# --- NEW: Wrapper for side-by-side layout --- #}
+        <div class="home-layout">
 
-        <hr style="margin: 30px 0;">
+            {# --- Left Column: Add Todo --- #}
+            <div class="home-column add-todo-column">
+                <section class="add-todo-section card">
+                    <h2>Add a New Todo</h2>
+                    <form class="add-todo-form" method="post" action="{% url 'home' %}">
+                         {% csrf_token %}
+                         {# Manual Field Rendering (keep as is) #}
+                         {% if add_todo_form.non_field_errors %}
+                            <div class="form-errors non-field-errors">
+                                {% for error in add_todo_form.non_field_errors %} <p>{{ error }}</p> {% endfor %}
+                            </div>
+                         {% endif %}
+                         {% for field in add_todo_form %}
+                            <div class="form-field">
+                                <label for="{{ field.id_for_label }}">{{ field.label }}</label>
+                                {% if field.field.widget.input_type == 'textarea' %}
+                                    <textarea id="{{ field.id_for_label }}" name="{{ field.name }}" rows="3" placeholder="{{ field.field.widget.attrs.placeholder|default:'' }}" class="form-input form-textarea"></textarea>
+                                {% else %}
+                                    <input id="{{ field.id_for_label }}" name="{{ field.name }}" type="{{ field.field.widget.input_type }}" placeholder="{{ field.field.widget.attrs.placeholder|default:field.label }}" class="form-input">
+                                {% endif %}
+                                {% if field.errors %} <p class="form-errors error-message">{% for error in field.errors %} {{ error }} {% endfor %}</p> {% endif %}
+                                {% if field.help_text %} <p class="help-text">{{ field.help_text|safe }}</p> {% endif %}
+                            </div>
+                         {% endfor %}
+                         <button type="submit" class="button button-primary">Add Todo</button>
+                    </form>
+                </section>
+            </div>
 
-        {# --- Todo List --- #}
-        <h2>My Todos</h2>
-        {% if todo_list %}
-            <ul style="list-style: none; padding: 0;">
-                {% for todo in todo_list %}
-                    <li style="border: 1px solid #eee; padding: 15px; margin-bottom: 10px; border-radius: 5px; background-color: {% if todo.status == 'DONE' %}#e8f5e9{% else %}#f9f9f9{% endif %};"> {# Change background if done #}
-                        <strong style="text-decoration: {% if todo.status == 'DONE' %}line-through{% else %}none{% endif %};"> {# Strikethrough if done #}
-                            {{ todo.title }}
-                        </strong>
-                        ({{ todo.get_status_display }}) {# Shows 'Pending' or 'Done' #}
-                        <br>
-                        {% if todo.description %}
-                            <small style="color: #555;">{{ todo.description }}</small><br>
-                        {% endif %}
-                        <small style="color: #888;">Added: {{ todo.created_at|date:"Y-m-d H:i" }}</small>
+            {# --- Right Column: Todo List --- #}
+            <div class="home-column todo-list-column">
+                <section class="todo-list-section">
+                    <h2>My Todos</h2>
+                    {% if todo_list %}
+                        <ul class="todo-list">
+                            {% for todo in todo_list %}
+                            <li class="todo-item card {% if todo.status == 'DONE' %}todo-item-done{% endif %}">
 
-                        {# --- Action Buttons within Forms --- #}
-                        <div style="margin-top: 10px;">
-                            {# Update Status Form/Button #}
-                            <form method="post" action="{% url 'update_todo_status' todo.id %}" style="display: inline;">
+                            {# 1. UPDATE STATUS FORM (Now at the front) #}
+                            <form method="post" action="{% url 'update_todo_status' todo.id %}" class="inline-form update-status-form">
                                 {% csrf_token %}
-                                <button type="submit">
-                                    {% if todo.status == 'DONE' %}Mark Pending{% else %}Mark Done{% endif %}
-                                </button>
+                                <input
+                                    type="checkbox"
+                                    name="status"
+                                    class="todo-status-checkbox" {# Class for styling #}
+                                    id="update-{{ todo.id }}"
+                                    {% if todo.status == 'DONE' %}checked{% endif %} {# Set checked state #}
+                                    onchange="this.form.submit()" {# Submit form on change #}
+                                    title="Mark as {% if todo.status == 'DONE' %}Pending{% else %}Done{% endif %}"
+                                    >
                             </form>
 
-                            {# Delete Form/Button #}
-                            <form method="post" action="{% url 'delete_todo' todo.id %}" style="display: inline;" onsubmit="return confirm('Are you sure you want to delete this item?');">
-                                {% csrf_token %}
-                                <button type="submit" style="color: white; background-color: #dc3545; border-color: #dc3545; cursor: pointer;">Delete</button>
-                            </form>
-                        </div>
-                    </li>
-                {% endfor %}
-            </ul>
-        {% else %}
-            <p>You haven't added any todos yet. Add one above!</p>
-        {% endif %}
+                            {# 2. TODO CONTENT (Title, Description, Timestamp) #}
+                            <div class="todo-content">
+                                <strong class="todo-title">{{ todo.title }}</strong>
+                                {# Optional: Remove this status text as checkbox shows state #}
+                                {# <span class="todo-status">({{ todo.get_status_display }})</span> #}
 
+                                {% if todo.description %}
+                                    <p class="todo-description">{{ todo.description }}</p>
+                                {% endif %}
+                                <p class="todo-timestamp">Added: {{ todo.created_at|date:"Y-m-d H:i" }}</p>
+                            </div>
+
+                            {# 3. TODO ACTIONS (Now only contains Delete) #}
+                            <div class="todo-actions">
+                                <form method="post" action="{% url 'delete_todo' todo.id %}" class="inline-form" onsubmit="return confirm('Are you sure you want to delete this item?');">
+                                    {% csrf_token %}
+                                    <button type="submit" class="button button-delete">Delete</button>
+                                </form>
+                            </div>
+
+                        </li> {# End of todo-item li #}
+                    {% endfor %}
+                        </ul>
+                    {% else %}
+                        <p class="no-todos-message card">You haven't added any todos yet. Add one on the left!</p> {# Added card style #}
+                    {% endif %}
+                </section>
+            </div>
+
+        </div> {# --- End of home-layout --- #}
     {% else %}
-        {# --- User is Not Logged In --- #}
-        <h2>Welcome to the Todo App!</h2>
-        <p>Please <a href="{% url 'login' %}">login</a> or <a href="{% url 'signup' %}">sign up</a> to manage your todos.</p>
+        {# --- User is Not Logged In (Keep as is) --- #}
+        <div class="welcome-message card">
+            <h2>Welcome to the Todo App!</h2>
+            <p>Please <a href="{% url 'login' %}">login</a> or <a href="{% url 'signup' %}">sign up</a> to manage your todos.</p>
+        </div>
     {% endif %}
 {% endblock %}

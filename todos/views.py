@@ -23,61 +23,67 @@ def signup(request):
     return render(request, 'registration/signup.html', {'form': form})
 
 
+# todos/views.py (Examples of refactored parts)
+
+from django.shortcuts import render, redirect, get_object_or_404
+from django.http import HttpResponseForbidden, Http404
+from django.contrib.auth.decorators import login_required
+from django.views.decorators.http import require_POST
+from django.core.exceptions import PermissionDenied
+
+from . import services # Import the service module
+from .forms import TodoForm
+from .models import TodoItem # May still be needed for DoesNotExist exception
+
 # --- Home/Todo View ---
 def home(request):
-    # ... (keep home view as is) ...
     if not request.user.is_authenticated:
         return render(request, 'home.html')
     else:
         if request.method == 'POST':
-            # This POST handling is only for ADDING todos via the main form
             form = TodoForm(request.POST)
             if form.is_valid():
-                todo_item = form.save(commit=False)
-                todo_item.user = request.user
-                todo_item.save()
-                return redirect('home')
-            # If invalid, fall through to render with the invalid form
+                try:
+                    services.create_todo(
+                        user=request.user,
+                        title=form.cleaned_data['title'],
+                        description=form.cleaned_data['description']
+                    )
+                    return redirect('home')
+                except ValueError as e: # Example: Catch specific service errors
+                    form.add_error(None, str(e)) # Add non-field error
+                # Let invalid form fall through
         else: # GET request
-            form = TodoForm() # Create empty form for adding
+            form = TodoForm()
 
-        user_todos = TodoItem.objects.filter(user=request.user).order_by('created_at')
-        context = {
-            'todo_list': user_todos,
-            'add_todo_form': form, # Pass the form instance (empty or invalid)
-        }
+        user_todos = services.get_todos_for_user(user=request.user)
+        context = { 'todo_list': user_todos, 'add_todo_form': form }
         return render(request, 'home.html', context)
 
-
 # --- Update and Delete Views ---
-
-@login_required # Ensure user is logged in
-@require_POST # Ensure this view only accepts POST requests
+@login_required
+@require_POST
 def update_todo_status(request, todo_id):
-    todo = get_object_or_404(TodoItem, id=todo_id)
+    try:
+        services.update_todo_status(user=request.user, todo_id=todo_id)
+    except TodoItem.DoesNotExist:
+        raise Http404("Todo item not found")
+    except PermissionDenied as e:
+        return HttpResponseForbidden(str(e))
+    # Handle other potential service exceptions if needed
+    return redirect('home')
 
-    # Check if the logged-in user owns this todo item
-    if todo.user != request.user:
-        return HttpResponseForbidden("You do not have permission to update this item.")
-
-    # Simple toggle logic: If Done -> Pending, otherwise -> Done
-    if todo.status == 'DONE':
-        todo.status = 'PENDING'
-    else:
-        # Consider adding 'IN_PROGRESS' later if needed
-        todo.status = 'DONE'
-
-    todo.save()
-    return redirect('home') # Redirect back to the homepage
-
-@login_required # Ensure user is logged in
-@require_POST # Ensure this view only accepts POST requests
+@login_required
+@require_POST
 def delete_todo(request, todo_id):
-    todo = get_object_or_404(TodoItem, id=todo_id)
+    try:
+        services.delete_todo(user=request.user, todo_id=todo_id)
+    except TodoItem.DoesNotExist:
+        raise Http404("Todo item not found")
+    except PermissionDenied as e:
+        return HttpResponseForbidden(str(e))
+    # Handle other potential service exceptions if needed
+    return redirect('home')
 
-    # Check if the logged-in user owns this todo item
-    if todo.user != request.user:
-        return HttpResponseForbidden("You do not have permission to delete this item.")
-
-    todo.delete()
-    return redirect('home') # Redirect back to the homepage
+# Keep signup view as is (uses UserCreationForm which handles its own logic)
+# ...
